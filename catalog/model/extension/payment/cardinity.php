@@ -78,6 +78,12 @@ class ModelExtensionPaymentCardinity extends Model {
 			"project_id" => $project_key,
 			"return_url" => $payment_data['return_url'],
 		];
+        if(isset($payment_data['email_address'])){
+            $attributes['email_address'] = $payment_data['email_address'];
+        }
+        if(isset($payment_data['mobile_phone_number'])){
+            $attributes['mobile_phone_number'] = $payment_data['mobile_phone_number'];
+        }
 
 		ksort($attributes);
 

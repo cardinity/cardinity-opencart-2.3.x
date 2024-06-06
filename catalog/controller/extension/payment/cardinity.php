@@ -41,6 +41,16 @@ class ControllerExtensionPaymentCardinity extends Controller
 				$data['order_id'] = $formattedOrderId; //$this->session->data['order_id'];
 				$data['description'] = $this->session->getId(); //  'OC' . $this->session->data['order_id'];
 				$data['return_url'] = $this->url->link('extension/payment/cardinity/externalPaymentCallback', '', true);
+
+                if (!empty($order_info['email'])){
+                    $data['email_address'] =  $order_info['email'];
+                }
+                if (!empty($order_info['telephone'])){
+                    $data['mobile_phone_number'] =  $order_info['telephone'];
+                }
+
+                $this->testLog("Requesting".print_r($data, true));
+
 				$attributes = $this->model_extension_payment_cardinity->createExternalPayment($this->config->get('payment_cardinity_project_key'), $this->config->get('payment_cardinity_project_secret'), $data);
 
 				//these two are for website not for api
@@ -229,7 +239,15 @@ class ControllerExtensionPaymentCardinity extends Controller
 				$order_country = $order_info['shipping_iso_code_2'];
 			}
 
-			$payment_data = array(
+            $cardholder_info = [];
+            if (!empty($order_info['email'])){
+               $cardholder_info['email_address'] =  $order_info['email'];
+            }
+            if (!empty($order_info['telephone'])){
+                $cardholder_info['mobile_phone_number'] =  $order_info['telephone'];
+            }
+
+            $payment_data = array(
 				'amount'			 => (float)$this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false),
 				'currency'			 => $order_info['currency_code'],
 				'order_id'			 => $order_id,
@@ -255,6 +273,7 @@ class ControllerExtensionPaymentCardinity extends Controller
 						"color_depth" => (int)$this->request->post['color_depth'],
 						"time_zone" => (int)$this->request->post['time_zone']
 					],
+                    'cardholder_info' => $cardholder_info
 				],
 			);
 
@@ -605,7 +624,6 @@ class ControllerExtensionPaymentCardinity extends Controller
 		$this->model_checkout_order->addOrderHistory($this->session->data['order_id'], $this->config->get('payment_cardinity_order_status_id'));
 
 		$this->model_extension_payment_cardinity->log($this->language->get('text_payment_success'));
-		$this->model_extension_payment_cardinity->log($payment);
 	}
 
 	private function failedOrder($log = null, $alert = null)
@@ -649,10 +667,6 @@ class ControllerExtensionPaymentCardinity extends Controller
 			if (!$order_info) {
 				$error['warning'] = $this->language->get('error_process_order');
 			}
-		}
-
-		if (!in_array($order_info['currency_code'], $this->model_extension_payment_cardinity->getSupportedCurrencies())) {
-			$error['warning'] = $this->language->get('error_invalid_currency');
 		}
 
 		if (!isset($this->request->post['holder']) || utf8_strlen($this->request->post['holder']) < 1 || utf8_strlen($this->request->post['holder']) > 32) {
