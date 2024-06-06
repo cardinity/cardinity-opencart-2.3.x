@@ -49,8 +49,6 @@ class ControllerExtensionPaymentCardinity extends Controller
                     $data['mobile_phone_number'] =  $order_info['telephone'];
                 }
 
-                $this->testLog("Requesting".print_r($data, true));
-
 				$attributes = $this->model_extension_payment_cardinity->createExternalPayment($this->config->get('payment_cardinity_project_key'), $this->config->get('payment_cardinity_project_secret'), $data);
 
 				//these two are for website not for api
