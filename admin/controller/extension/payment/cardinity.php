@@ -266,6 +266,10 @@ class ControllerExtensionPaymentCardinity extends Controller {
 
 			$payment = $this->model_extension_payment_cardinity->getPayment($client, $order['payment_id']);
 
+            if(!$payment){
+                return;
+            }
+
 			$data['refund_action'] = false;
 
 			$successful_statuses = array(

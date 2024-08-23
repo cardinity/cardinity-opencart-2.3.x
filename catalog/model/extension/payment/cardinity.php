@@ -77,6 +77,7 @@ class ModelExtensionPaymentCardinity extends Model {
 			"description" => $payment_data['description'],
 			"project_id" => $project_key,
 			"return_url" => $payment_data['return_url'],
+            "notification_url" => $payment_data['notification_url'],
 		];
         if(isset($payment_data['email_address'])){
             $attributes['email_address'] = $payment_data['email_address'];
